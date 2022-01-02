@@ -1,0 +1,166 @@
+[
+  {
+    "ID": "DAX_DIVISION_COLUMNS",
+    "Name": "Avoid division (use DIVIDE function instead)",
+    "Category": "DAX Expressions",
+    "Description": "Calculated Columns, Measures or Calculated Tables should not use the division symbol in their expressions (/) unless the denominator is a constant value. Instead, it is advised to always use the DIVIDE(<numerator>,<denominator>) function.",
+    "Severity": 3,
+    "Scope": "Measure, CalculatedColumn, CalculatedTable",
+    "Expression": "Tokenize().Any(\n    Type = DIV and\n    Next.Type <> INTEGER_LITERAL and\n    Next.Type <> REAL_LITERAL\n)",
+    "CompatibilityLevel": 1200
+  },
+  {
+    "ID": "DAX_COLUMNS_FULLY_QUALIFIED",
+    "Name": "Column references should be fully qualified",
+    "Category": "DAX Expressions",
+    "Description": "Using fully qualified column references makes it easier to distinguish between column and measure references, and also helps avoid certain errors.",
+    "Severity": 2,
+    "Scope": "Measure, CalculatedColumn, CalculatedTable, KPI",
+    "Expression": "DependsOn.Any(Key.ObjectType = \"Column\" and Value.Any(not FullyQualified))",
+    "CompatibilityLevel": 1200
+  },
+  {
+    "ID": "DAX_MEASURES_UNQUALIFIED",
+    "Name": "Measure references should be unqualified",
+    "Category": "DAX Expressions",
+    "Description": "Using unqualified measure references makes it easier to distinguish between column and measure references, and also helps avoid certain errors.",
+    "Severity": 3,
+    "Scope": "Measure, CalculatedColumn, CalculatedTable, KPI",
+    "Expression": "DependsOn.Any(Key.ObjectType = \"Measure\" and Value.Any(FullyQualified))",
+    "CompatibilityLevel": 1200
+  },
+  {
+    "ID": "DAX_TODO",
+    "Name": "Revisit TODO expressions",
+    "Category": "DAX Expressions",
+    "Description": "Objects with an expression containing the word \"TODO\" (typically as a comment), should most likely be revisited.",
+    "Severity": 1,
+    "Scope": "Measure, Partition, CalculatedColumn, CalculatedTable",
+    "Expression": "Expression.IndexOf(\"TODO\", StringComparison.OrdinalIgnoreCase) >= 0",
+    "CompatibilityLevel": 1200
+  },
+  {
+    "ID": "APPLY_FORMAT_STRING_MEASURES",
+    "Name": "Provide format string for visible numeric measures",
+    "Category": "Formatting",
+    "Description": "Visible measures should have their Format String property assigned",
+    "Severity": 3,
+    "Scope": "Measure",
+    "Expression": "IsVisible\nand string.IsNullOrWhitespace(FormatString)\nand (DataType = \"Int64\" or DataType = \"DateTime\" or DataType = \"Double\" or DataType = \"Decimal\")",
+    "CompatibilityLevel": 1200
+  },
+  {
+    "ID": "META_SUMMARIZE_NONE",
+    "Name": "Don't summarize numeric columns not referenced in any measure",
+    "Category": "Metadata",
+    "Description": "Set the SummarizeBy property of all visible numeric columns to \"None\", to avoid unintentional summarization in client tools (e.g., CalendarYear). Create measures for columns that are supposed to be summarized (in cases that measure and column have the same name, column name must start with (\"_\")).",
+    "Severity": 1,
+    "Scope": "DataColumn, CalculatedColumn, CalculatedTableColumn",
+    "Expression": "IsVisible\nand SummarizeBy <> \"None\"\nand (DataType = \"Double\" or DataType = \"Decimal\" or DataType = \"Int64\")",
+    "FixExpression": "SummarizeBy = AggregateFunction.None",
+    "CompatibilityLevel": 1200
+  },
+  {
+    "ID": "DISABLE_AUTO_DATE/TIME",
+    "Name": "Disable auto date/time",
+    "Category": "Model Layout",
+    "Description": "Provide your own Calendar tables instead of relying on Power BI Desktop's built-in auto date/time feature (go to File > Options and settings > Options > Current File > Data Load and remove the checkmark from \"Auto date/time\").",
+    "Severity": 3,
+    "Scope": "Model",
+    "Expression": "Tables.Any(HasAnnotation(\"__PBI_LocalDateTable\"))",
+    "CompatibilityLevel": 1200
+  },
+  {
+    "ID": "LAYOUT_HIDE_COLUMNS_STARTSWITH_",
+    "Name": "Hide columns that starts with _",
+    "Category": "Model Layout",
+    "Description": "Columns with same name of corresponding measure must start with _ and be hidden.",
+    "Severity": 1,
+    "Scope": "DataColumn, CalculatedColumn, CalculatedTableColumn",
+    "Expression": "IsVisible and Name.StartsWith(\"_\")",
+    "FixExpression": "IsHidden = true",
+    "CompatibilityLevel": 1200
+  },
+  {
+    "ID": "LAYOUT_HIDE_FK_COLUMNS",
+    "Name": "Hide foreign key columns",
+    "Category": "Model Layout",
+    "Description": "Columns used on the Many side of a relationship should be hidden, as the related (dimension) table is likely the best place to apply a filter context.",
+    "Severity": 1,
+    "Scope": "DataColumn, CalculatedColumn, CalculatedTableColumn",
+    "Expression": "IsVisible\nand Model.Relationships.Any(FromColumn = outerIt and IsActive)",
+    "FixExpression": "IsHidden = true",
+    "CompatibilityLevel": 1200
+  },
+  {
+    "ID": "NO_PASCALCASE_COLUMNS_HIERARCHIES",
+    "Name": "Avoid PascalCase (without whitespaces) on visible columns and hierarchies",
+    "Category": "Naming Conventions",
+    "Description": "Visible columns and hierarchies should not use PascalCase in their names",
+    "Severity": 2,
+    "Scope": "Hierarchy, DataColumn, CalculatedColumn, CalculatedTableColumn",
+    "Expression": "IsVisible \nand RegEx.IsMatch(Name, \"[A-Z]([A-Z0-9]*[a-z][a-z0-9]*[A-Z]|[a-z0-9]*[A-Z][A-Z0-9]*[a-z])[A-Za-z0-9]*\") \nand not Name.Contains(\" \")",
+    "CompatibilityLevel": 1200
+  },
+  {
+    "ID": "NO_PASCALCASE_MEASURES_TABLES",
+    "Name": "Avoid PascalCase (without whitespaces) on visible measures and tables",
+    "Category": "Naming Conventions",
+    "Description": "Visible measures and tables should not use PascalCase in their names",
+    "Severity": 2,
+    "Scope": "Table, Measure, CalculatedTable",
+    "Expression": "IsVisible \nand RegEx.IsMatch(Name, \"[A-Z]([A-Z0-9]*[a-z][a-z0-9]*[A-Z]|[a-z0-9]*[A-Z][A-Z0-9]*[a-z])[A-Za-z0-9]*\") \nand not Name.Contains(\" \")",
+    "CompatibilityLevel": 1200
+  },
+  {
+    "ID": "UPPERCASE_FIRST_LETTER_COLUMNS_HIERARCHIES",
+    "Name": "Column and hierarchy names must start with uppercase letter",
+    "Category": "Naming Conventions",
+    "Description": "Avoid using prefixes and camelCasing. Use \"Sales\" instead of \"dimSales\" or \"mSales\".",
+    "Severity": 2,
+    "Scope": "DataColumn, CalculatedColumn, CalculatedTableColumn",
+    "Expression": "IsVisible\nand char.IsLower(Name[0])\nand (Model.Cultures.Count = 0 or TranslatedNames.Any(it = \"\" or it = outerIt.Name))",
+    "CompatibilityLevel": 1200
+  },
+  {
+    "ID": "UPPERCASE_FIRST_LETTER_MEASURES_TABLES",
+    "Name": "Measure and table names must start with uppercase letter",
+    "Category": "Naming Conventions",
+    "Description": "Avoid using prefixes and camelCasing. Use \"Sales\" instead of \"dimSales\" or \"mSales\".",
+    "Severity": 2,
+    "Scope": "Table, Measure, CalculatedTable",
+    "Expression": "IsVisible\nand char.IsLower(Name[0])\nand (Model.Cultures.Count = 0 or TranslatedNames.Any(it = \"\" or it = outerIt.Name))\n",
+    "CompatibilityLevel": 1200
+  },
+  {
+    "ID": "RELATIONSHIP_COLUMN_NAMES",
+    "Name": "Names of columns in relationships should be the same",
+    "Category": "Naming Conventions",
+    "Description": "When a single relationship exists between two tables, the columns on both sides of the relationship must have the same name. When multiple relationships exist between two tables, the name of the FromColumn must end with the name of the ToColumn (for example OrderDateKey, ShipDateKey, DueDateKey, etc.)",
+    "Severity": 2,
+    "Scope": "Relationship",
+    "Expression": "(Model.Relationships.Count(FromTable = OuterIt.FromTable and ToTable = OuterIt.ToTable) = 1 and FromColumn.Name <> ToColumn.Name and ToTable.DataCategory <> (\"Time\")) or\n(Model.Relationships.Count(FromTable = OuterIt.FromTable and ToTable = OuterIt.ToTable) > 1 and not FromColumn.Name.EndsWith(ToColumn.Name) and ToTable.DataCategory <> (\"Time\"))",
+    "CompatibilityLevel": 1200
+  },
+  {
+    "ID": "AVOID_SINGLE_ATTRIBUTE_DIMENSIONS",
+    "Name": "Avoid single-attribute dimensions that are not shared by multiple facts",
+    "Category": "Performance",
+    "Description": "In general, over-normalization should be avoided. If a dimension only holds a single attribute and the dimension is not shared by multiple facts, consider moving the attribute to the fact table.",
+    "Severity": 1,
+    "Scope": "Table",
+    "Expression": "Columns.Count() <= 1 and Columns.Count(UsedInRelationships.Any()) <= 1 and\nModel.Relationships.Count(ToTable = outerIt) = 1",
+    "CompatibilityLevel": 1200
+  },
+  {
+    "ID": "PERF_UNUSED_COLUMNS",
+    "Name": "Remove unused columns",
+    "Category": "Performance",
+    "Description": "Hidden columns, which do not have any dependencies, are not used in any relationships, not used in any hierarchies and not used as the SortByColumn for other columns, will likely not be used by clients and thus take up unnecessary space. Consider removing the columns from the model to save space and improve processing time, if you are certain that no external DAX or MDX queries make use of the columns.",
+    "Severity": 3,
+    "Scope": "DataColumn, CalculatedColumn, CalculatedTableColumn",
+    "Expression": "not IsVisible\n\nand ReferencedBy.Count = 0 \n\nand (not UsedInRelationships.Any())\n\nand (not UsedInSortBy.Any())\n\nand (not UsedInHierarchies.Any())\n\nand (not UsedInVariations.Any()) and Table.DataCategory <> \"Time\"",
+    "FixExpression": "Delete()",
+    "CompatibilityLevel": 1200
+  }
+]
