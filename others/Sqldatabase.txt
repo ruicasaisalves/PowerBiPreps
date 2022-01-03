@@ -1,0 +1,10 @@
+let
+     SourceQuery = "
+SELECT 
+       *
+  FROM sqldatabase
+  WHERE 1=1
+",
+    Source = Sql.Database(Server, DataBase, [Query=SourceQuery])
+in
+    Source

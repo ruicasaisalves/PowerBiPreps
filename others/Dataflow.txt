@@ -1,0 +1,9 @@
+
+
+let
+    Source = PowerBI.Dataflows(null),
+    Workspace = Source{[workspaceId=Workspaceexample]}[Data],
+    Dataflow = Workspace{[dataflowId=DataflowExample]}[Data],
+    OurTable = Dataflow{[entity="Example"]}[Data]
+in
+    OurTable

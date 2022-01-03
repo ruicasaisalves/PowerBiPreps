@@ -1,0 +1,17 @@
+let
+Source = SharePoint.Files(Server ....
+FilteredRows
+
+
+let
+    Source = Databasefiles,
+    #"Added Custom" = Table.AddColumn(Source, "Custom", each let  #"Imported CSV" = Csv.Document([Content],null,{0, 45},ExtraValues.Ignore,1252),
+    #"Merged Columns" = Table.CombineColumns(#"Imported CSV",{"Column1", "Column2"},Combiner.CombineTextByDelimiter("", QuoteStyle.None),"Merged"),
+    #"Split Column by Delimiter" = Table.SplitColumn(#"Merged Columns", "Merged", Splitter.SplitTextByDelimiter(",", QuoteStyle.Csv), {"Merged.1", "Merged.2", "Merged.3", "Merged.4", "Merged.5", "Merged.6", "Merged.7", "Merged.8", "Merged.9", "Merged.10", "Merged.11", "Merged.12", "Merged.13", "Merged.14", "Merged.15", "Merged.16", "Merged.17", "Merged.18", "Merged.19", "Merged.20", "Merged.21", "Merged.22", "Merged.23", "Merged.24", "Merged.25", "Merged.26", "Merged.27", "Merged.28", "Merged.29", "Merged.30", "Merged.31", "Merged.32", "Merged.33", "Merged.34", "Merged.35", "Merged.36", "Merged.37", "Merged.38", "Merged.39", "Merged.40", "Merged.41", "Merged.42", "Merged.43", "Merged.44", "Merged.45", "Merged.46", "Merged.47", "Merged.48", "Merged.49"}),
+    #"Promoted Headers" = Table.PromoteHeaders(#"Split Column by Delimiter", [PromoteAllScalars=true]),
+    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Usage Start Date", type date}, {"Usage End Date", type date}}),
+    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"Column25", "Column26", "Column27", "Column28", "Column29", "Column30", "Column31", "Column32", "Column33", "Column34", "Column35", "Column36", "Column37", "Column38", "Column39", "Column40", "Column41", "Column42", "Column43", "Column44", "Column45", "Column46", "Column47", "Column48", "Column49"}),
+    #"Changed Type with Locale" = Table.TransformColumnTypes(#"Removed Columns", {{"Unit Price", type number}}, "en-150"),
+    #"Changed Type with Locale1" = Table.TransformColumnTypes(#"Changed Type with Locale", {{"Quantity", type number}}, "en-150"),
+    #"Changed Type with Locale2" = Table.TransformColumnTypes(#"Changed Type with Locale1", {{"Amount", type number}}, "en-150")
+in
